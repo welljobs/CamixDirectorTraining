@@ -9,8 +9,12 @@ from .media_studio import probe,waveform
 
 
 class Studio:
-    def __init__(self,manager):self.manager=manager;self.root=manager.root;self.annotations=AnnotationStore(self.root)
+    def __init__(self,manager):
+        self.manager=manager;self.root=manager.root;self.annotations=AnnotationStore(self.root)
+        from .v2_api import V2Studio
+        self.v2=V2Studio(manager)
     def get(self,route,query):
+        if route.startswith('/api/studio/v2/'):return self.v2.get(route,query)
         first=lambda key,default='':query.get(key,[default])[0]
         if route=='/api/studio/media-list':
             paths=[];manifests=[]
@@ -45,6 +49,7 @@ class Studio:
             return read_json(p)
         raise ValueError('Unknown studio endpoint')
     def post(self,route,payload):
+        if route.startswith('/api/studio/v2/'):return self.v2.post(route,payload)
         if not isinstance(payload,dict):raise ValueError('请求必须是JSON对象')
         if route=='/api/studio/preflight':
             result=check_training(self.root,payload)

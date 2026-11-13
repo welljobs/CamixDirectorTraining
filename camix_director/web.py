@@ -65,7 +65,7 @@ def make_server(manager,port=8765,token=None):
             # A normal top-level link may come from another site (e.g. a chat).
             # Only the public entry document is exempt; APIs, media and embeds
             # retain the cross-site block, in addition to Host/Origin/token checks.
-            entry_navigation=(self.command=='GET' and urlparse(self.path).path in ('/','/index.html')
+            entry_navigation=(self.command=='GET' and urlparse(self.path).path in ('/','/index.html','/v2','/v2.html')
                 and self.headers.get('Sec-Fetch-Mode')=='navigate'
                 and self.headers.get('Sec-Fetch-Dest')=='document')
             if self.headers.get('Sec-Fetch-Site')=='cross-site' and not entry_navigation:
@@ -92,10 +92,10 @@ def make_server(manager,port=8765,token=None):
                 parsed=urlparse(self.path);route=parsed.path;query=parse_qs(parsed.query)
                 self._security(route.startswith('/api/') and route!='/api/media')
                 if route=='/api/media':return self._media(query)
-                if route in ('/','/index.html','/app.js','/style.css','/studio.js','/studio.css'):
-                    name='index.html' if route in ('/','/index.html') else route[1:]
+                if route in ('/','/index.html','/app.js','/style.css','/studio.js','/studio.css','/v2','/v2.html','/v2.js','/v2.css'):
+                    name='index.html' if route in ('/','/index.html') else 'v2.html' if route=='/v2' else route[1:]
                     path=ASSETS/name
-                    return self._bytes(path.read_bytes(),{'index.html':'text/html; charset=utf-8','app.js':'text/javascript; charset=utf-8','style.css':'text/css; charset=utf-8','studio.js':'text/javascript; charset=utf-8','studio.css':'text/css; charset=utf-8'}[name])
+                    return self._bytes(path.read_bytes(),{'index.html':'text/html; charset=utf-8','app.js':'text/javascript; charset=utf-8','style.css':'text/css; charset=utf-8','studio.js':'text/javascript; charset=utf-8','studio.css':'text/css; charset=utf-8','v2.html':'text/html; charset=utf-8','v2.js':'text/javascript; charset=utf-8','v2.css':'text/css; charset=utf-8'}[name])
                 if route.startswith('/api/studio/'):return self._json(studio.get(route,query))
                 if route=='/api/state':
                     import shutil
