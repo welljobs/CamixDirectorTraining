@@ -1,0 +1,15 @@
+{
+  "max_cameras": 2,
+  "image_size": 64,
+  "sample_rate": 16000,
+  "audio_samples": 4000,
+  "decision_hz": 5.0,
+  "hidden_dim": 32,
+  "heads": 4,
+  "layers": 1,
+  "memory_tokens": 8,
+  "dropout": 0.0,
+  "visual_encoder": "tiny_cnn",
+  "pretrained_visual": false,
+  "audio_encoder": "normalized_cnn"
+}

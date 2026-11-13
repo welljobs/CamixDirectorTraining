@@ -1,0 +1,6 @@
+# Portable training/media/test dependencies. Install torch/torchvision separately
+# from the desired official CPU/CUDA index; never install macOS coremltools here.
+numpy==1.26.4
+av==16.0.1
+pillow==11.3.0
+pytest==8.3.5

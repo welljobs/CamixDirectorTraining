@@ -1,0 +1,55 @@
+# 本地环境与缓存
+.venv/
+.venv-win/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+.cache/
+.DS_Store
+
+# 本机工作区状态、会话与私有配置
+.camix-training-workspace.json
+.web/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 素材、训练数据、实验结果和模型：由使用者在本机生成
+/data/
+/datasets/
+/downloads/
+/runs/
+/reports/
+/artifacts/
+/models/
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.mlmodel
+*.mlpackage/
+*.mlmodelc/
+*.avi
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.zip
+*.whl
+*.part
+*.partial
+*.parts/
+*.log
+
+# 构建与打包产物
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,2 @@
+{"time_s":5.2,"preferred":"cam_b","rejected":["keep"],"note":"EXAMPLE ONLY: replace with reviewed preference"}
+{"time_s":7.6,"preferred":"keep","rejected":["cam_a"],"note":"EXAMPLE ONLY: do not infer KEEP from absence of a click"}

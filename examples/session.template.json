@@ -1,0 +1,17 @@
+{
+  "session_id": "YOUR-UNIQUE-SESSION-ID",
+  "split": "train",
+  "duration_seconds": 60,
+  "alignment_verified": false,
+  "human_reviewed": false,
+  "supervision": "human_director_preferences",
+  "program_history_source": "actual_recorded",
+  "initial_program": "cam_a",
+  "cameras": [
+    {"id":"cam_a","video":"cam_a.mp4","audio":"cam_a.wav","video_delay":0,"audio_delay":0},
+    {"id":"cam_b","video":"cam_b.mp4","audio":"cam_b.wav","video_delay":0,"audio_delay":0}
+  ],
+  "program_events": "program-events.jsonl",
+  "annotations": "preferences.jsonl",
+  "provenance": {"origin":"fill in authorised source and original clock mapping"}
+}

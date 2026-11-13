@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-11-12T03:41:12.617644+00:00",
+  "source": "https://pytorch.org/get-started/previous-versions/",
+  "source_page_sha256": "3bd95c8b33e589bfdd6a49c6bb156cefaf61c019823063cbf7f091a6ab13aa1d",
+  "torch": "2.7.0",
+  "torchvision": "0.22.0",
+  "official_windows_indexes": [
+    "cpu",
+    "cu118",
+    "cu126",
+    "cu128"
+  ],
+  "note": "Installation instructions verified, not a Windows hardware execution result."
+}

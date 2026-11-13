@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "camix-director-training"
+version = "0.3.0"
+description = "Causal audiovisual value learning with bounded Transformer memory; training only"
+requires-python = ">=3.11,<3.13"
+dependencies = ["torch>=2.7,<2.8", "numpy>=1.26,<2"]
+
+[project.optional-dependencies]
+export = ["coremltools==9.0; sys_platform == 'darwin'"]
+media = ["av==16.0.1"]
+vision = ["torchvision==0.22.0"]
+test = ["pytest==8.3.5"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[project.scripts]
+camix-training-web = "camix_director.web:main"
+
+[tool.setuptools.package-data]
+camix_director = ["web_assets/*.html", "web_assets/*.css", "web_assets/*.js"]
+
+[tool.setuptools.packages.find]
+include = ["camix_director*"]

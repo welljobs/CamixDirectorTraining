@@ -1,0 +1,5 @@
+# For Windows use setup_windows.bat to choose the CPU/CUDA build first.
+torch==2.7.0
+torchvision==0.22.0
+-r requirements-train.txt
+coremltools==9.0; sys_platform == "darwin"

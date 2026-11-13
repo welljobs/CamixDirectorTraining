@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-11-12T03:44:44.342595+00:00",
+  "windows_execution_tested": false,
+  "packages": [
+    {
+      "package": "av",
+      "version": "16.0.1",
+      "source": "https://pypi.org/pypi/av/16.0.1/json",
+      "windows_cp311_or_pure_wheels": [
+        {
+          "filename": "av-16.0.1-cp311-cp311-win_amd64.whl",
+          "sha256": "ffea39ac7574f234f5168f9b9602e8d4ecdd81853238ec4d661001f03a6d3f64"
+        }
+      ]
+    },
+    {
+      "package": "numpy",
+      "version": "1.26.4",
+      "source": "https://pypi.org/pypi/numpy/1.26.4/json",
+      "windows_cp311_or_pure_wheels": [
+        {
+          "filename": "numpy-1.26.4-cp311-cp311-win_amd64.whl",
+          "sha256": "cd25bcecc4974d09257ffcd1f098ee778f7834c3ad767fe5db785be9a4aa9cb2"
+        }
+      ]
+    },
+    {
+      "package": "pillow",
+      "version": "11.3.0",
+      "source": "https://pypi.org/pypi/pillow/11.3.0/json",
+      "windows_cp311_or_pure_wheels": [
+        {
+          "filename": "pillow-11.3.0-cp311-cp311-win_amd64.whl",
+          "sha256": "1a992e86b0dd7aeb1f053cd506508c0999d710a8f07b4c791c63843fc6a807ac"
+        }
+      ]
+    },
+    {
+      "package": "pytest",
+      "version": "8.3.5",
+      "source": "https://pypi.org/pypi/pytest/8.3.5/json",
+      "windows_cp311_or_pure_wheels": [
+        {
+          "filename": "pytest-8.3.5-py3-none-any.whl",
+          "sha256": "c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820"
+        }
+      ]
+    }
+  ]
+}
