@@ -1,5 +1,34 @@
 # AMI 原分辨率素材（2026-11-12）
 
+## 已发布到 GitHub 的素材
+
+素材 Release：https://github.com/welljobs/CamixDirectorTraining/releases/tag/ami-originals-576-20261116
+
+- 原片：16个AVI＋16个WAV，共6.30GB，直接附件上传，不经过Git历史。
+- 已准备训练包：16个NPZ，共约477MB；这是V1的224px四机位弱监督包，不是已审核V2语料。
+- 附件含逐文件SHA256、公共来源清单、AMI署名和CC BY4.0许可；不包含模型、私人录制、网页会话或完整人工标注ZIP。
+
+### 只拿训练包（在代码仓库根目录执行）
+
+```bash
+gh release download ami-originals-576-20261116 --repo welljobs/CamixDirectorTraining --dir material-downloads --pattern '*.npz' --pattern 'ami-materials-manifest.json' --pattern 'AMI-*' --pattern 'CC-BY-4.0.txt' --pattern 'SHA256SUMS'
+python scripts/restore_ami_materials.py --download-dir material-downloads --project .
+```
+
+恢复工具使用Python标准库、无网络请求，先校验SHA256再移动到对应目录；同盘无需再复制一遍，已有不同内容不会被覆盖。恢复后选 `data/ami_originals_576/prepared_224_4x60` 与 `ami-originals-224-config`。
+
+### 需要原片做标注或V2数据
+
+```bash
+gh release download ami-originals-576-20261116 --repo welljobs/CamixDirectorTraining --dir raw-materials --pattern '*.avi' --pattern '*.wav' --pattern 'ami-materials-manifest.json' --pattern 'AMI-*' --pattern 'CC-BY-4.0.txt' --pattern 'SHA256SUMS'
+python scripts/restore_ami_materials.py --download-dir raw-materials --project .
+```
+
+也可从Release页面手动下载。未安装GitHub CLI时，下载所需附件、清单和恢复脚本后，按附件说明操作即可。原片需要额外6.30GB空间，训练缓存/V2特征还需要另外预留磁盘；不要只按素材大小计算空间。
+
+源素材仍可由原有官方下载器获取。这里的SHA256是复现与传输校验，不宣称是AMI发布的逐文件签名。素材许可不改变软件代码许可，也不代表专业导播验收通过。
+
+
 ## 这次下载的是什么
 
 - 官方 AMI Meeting Corpus 的 `_orig.avi`，保留原文件；不是把小视频放大。

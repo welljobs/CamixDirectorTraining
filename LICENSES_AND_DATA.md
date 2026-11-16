@@ -29,3 +29,11 @@ downloads/ 是本机复现依赖缓存，不代表已对再分发或商用进行
 ## 本工程
 
 未擅自把 Camix 或该训练工程声明为对外开源。工程对外发布许可由项目所有者决定。
+
+## 本仓库发布的 AMI 素材附件
+
+本次限定发布 ES2006a、ES2007a、ES2008a、ES2009a 的32个原始音视频 signals，以及16个依据word时间生成的弱监督训练包，入口：https://github.com/welljobs/CamixDirectorTraining/releases/tag/ami-originals-576-20261116
+
+原片未重编码；派生包的采样、缩放、音频窗口与弱标签修改均在附件署名文件说明。保留AMI Meeting Corpus / AMI Consortium出处、CC BY4.0链接/文本和无背书说明。没有公开完整人工标注归档或将该许可扩展到其他注释。
+
+Git历史不包含这些大文件；附件中的 `ami-materials-manifest.json` 和 `SHA256SUMS` 用于完整性/复现，不冒充官方逐文件签名。下载、移动或重新训练并不会把弱监督升级为真实导演审核。此素材发布不为软件代码授予额外许可，也不对所有用途的其他权利作额外保证。
