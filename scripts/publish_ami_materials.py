@@ -6,7 +6,7 @@ private data, repository clone data, source overwrite or asset clobber occurs.
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from datetime import datetime,timezone
-import argparse,hashlib,json,os,re,shutil,subprocess,tempfile,time,urllib.request
+import argparse,hashlib,json,os,re,shutil,subprocess,tempfile,time,urllib.request,threading
 
 REPOSITORY='welljobs/CamixDirectorTraining'
 BASE='https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus'
@@ -37,38 +37,60 @@ def validate(plan):
 def match(asset,expected):
     return asset['state']=='uploaded' and asset['size']==expected['bytes'] and asset.get('digest')=='sha256:'+expected['sha256']
 
+NETWORK_SLOTS=threading.Semaphore(3)
+
 def download(row,path,rate_mib=2):
-    """One bounded stream per worker; up to3 workers => total<=6MiB/s."""
-    expected=row['bytes']
-    for attempt in range(12):
-        offset=path.stat().st_size if path.exists() else 0
-        if offset==expected:break
-        headers={'User-Agent':'CamixDirectorTraining verified AMI release mirror (rate-limited)'}
-        if offset:
-            headers['Range']=f'bytes={offset}-'
-            if row.get('etag'):headers['If-Range']=row['etag']
-        started=time.monotonic();received=0
-        try:
-            with urllib.request.urlopen(urllib.request.Request(row['url'],headers=headers),timeout=120) as response:
-                if offset:
-                    if response.status!=206 or response.headers.get('Content-Range')!=f'bytes {offset}-{expected-1}/{expected}':raise ValueError('Exact resume range required')
-                elif response.status!=200:raise ValueError('Unexpected signal HTTP status')
-                if int(response.headers.get('Content-Length','-1'))!=expected-offset:raise ValueError('Signal length changed')
-                with path.open('ab') as f:
-                    while True:
-                        b=response.read(min(64*1024,expected-offset-received+1))
-                        if not b:break
-                        if offset+received+len(b)>expected:raise ValueError('Overlong signal')
-                        f.write(b);received+=len(b)
-                        delay=received/(rate_mib*1024**2)-(time.monotonic()-started)
-                        if delay>0:time.sleep(delay)
-            if offset+received!=expected:raise OSError('Truncated signal')
-            break
-        except ValueError:raise
-        except Exception as e:
-            print('AMI RETRY',row['asset_name'],attempt+1,type(e).__name__,flush=True)
-            if attempt==11:raise
-            time.sleep(min(2**attempt,30))
+    """Verified finite4MiB ranges; all workers share3 network slots (<=6MiB/s).
+
+    A slow whole-file HTTP response cannot hold up an entire meeting. Completed
+    prefix bytes are retained; only this runner's own range parts are removed.
+    """
+    expected=row['bytes'];offset=path.stat().st_size if path.exists() else 0
+    if not 0<=offset<=expected:raise ValueError('Invalid source prefix')
+    if offset==expected:
+        if sha(path)!=row['sha256']:raise ValueError('Source checksum mismatch')
+        return
+    directory=path.parent/(path.name+'.ranges');directory.mkdir(exist_ok=True)
+    length=4*1024**2
+    segments=[(i,min(expected,i+length)-1) for i in range(offset,expected,length)]
+    def part(segment):
+        lo,hi=segment;target=directory/f'{lo}-{hi}';count=hi-lo+1
+        if target.exists() and target.stat().st_size==count:return target
+        for attempt in range(10):
+            try:
+                with NETWORK_SLOTS:
+                    started=time.monotonic();received=0
+                    headers={'Range':f'bytes={lo}-{hi}','Cache-Control':'no-cache','User-Agent':'CamixDirectorTraining verified AMI bounded-range mirror'}
+                    if row.get('etag'):headers['If-Range']=row['etag']
+                    with urllib.request.urlopen(urllib.request.Request(row['url'],headers=headers),timeout=60) as response:
+                        if response.status!=206 or response.headers.get('Content-Range')!=f'bytes {lo}-{hi}/{expected}':raise ValueError('Exact finite range required')
+                        if int(response.headers.get('Content-Length','-1'))!=count:raise ValueError('Range size changed')
+                        if row.get('etag') and response.headers.get('ETag') and response.headers['ETag']!=row['etag']:raise ValueError('Source ETag changed')
+                        temporary=target.with_suffix('.partial')
+                        with temporary.open('wb') as output:
+                            while True:
+                                block=response.read(min(64*1024,count-received+1))
+                                if not block:break
+                                received+=len(block)
+                                if received>count:raise ValueError('Overlong range')
+                                output.write(block)
+                                delay=received/(rate_mib*1024**2)-(time.monotonic()-started)
+                                if delay>0:time.sleep(delay)
+                        if received!=count:raise OSError('Truncated range')
+                    temporary.replace(target)
+                return target
+            except ValueError:raise
+            except Exception as error:
+                print('RANGE RETRY',row['asset_name'],lo,attempt+1,type(error).__name__,flush=True)
+                if attempt==9:raise
+                time.sleep(min(2**attempt,15))
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        with path.open('ab') as output:
+            for segment,chunk in zip(segments,pool.map(part,segments)):
+                if output.tell()!=segment[0]:raise ValueError('Noncontiguous recovered source')
+                with chunk.open('rb') as source:shutil.copyfileobj(source,output,1024**2)
+                output.flush();chunk.unlink()
+    directory.rmdir()
     if path.stat().st_size!=expected or sha(path)!=row['sha256']:raise ValueError('Official signal checksum mismatch; no upload')
 
 def main():
