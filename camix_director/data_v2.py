@@ -63,7 +63,8 @@ class EventFeatureSequences(IterableDataset):
                 for key in extra:
                     extra[key].append(values[key])
             observations = {key: arrays[key] for key in arrays}
-            observations.update(current_program=pgm, held_seconds=held)
+            observations.update(current_program=pgm, held_seconds=held,
+                                style_features=np.broadcast_to(np.array([m['style'].get(k, 0.) for k in ('pace','reaction_bias','detail_bias')],np.float32),(count,3)).copy())
             yield dict(observations=observations,
                        targets=dict(acceptable_cameras=acceptable, annotated=annotated, **{key: np.asarray(value) for key, value in extra.items()}),
                        state=dict(original_event_id=m['original_event_id'], chunk_index=ordinal,

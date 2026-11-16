@@ -140,7 +140,15 @@ def interval(row, duration):
 def validate_manifest(value):
     m = deepcopy(value)
     fields = ('format', 'original_event_id', 'split', 'source', 'duration_s', 'initial_program', 'cameras', 'clock', 'license', 'scenario_tags', 'style', 'program_events', 'shot_preferences', 'events', 'comparisons')
-    object_fields(m, fields, fields)
+    object_fields(m, fields+('trajectory_origin',), fields)
+    if 'trajectory_origin' in m:
+        origin=m['trajectory_origin']
+        origin_fields=('kind','checkpoint_sha256','replay_sha256','source_index_sha256','source_content_sha256')
+        object_fields(origin,origin_fields,origin_fields)
+        if origin['kind']!='offline_policy':
+            raise ValueError('Unknown trajectory origin')
+        for field in origin_fields[1:]:
+            sha256(origin[field])
     if m['format'] != EVENT_FORMAT:
         raise ValueError('Not a V2 event; schema-1 is not silently converted')
     text(m['original_event_id'], 'original event ID', 160)
@@ -157,7 +165,10 @@ def validate_manifest(value):
     text(m['license']['name'], 'license')
     boolean(m['license']['usage_confirmed'], 'usage_confirmed')
     strings(m['scenario_tags'], 'scenario tags')
-    object_fields(m['style'], ('name', 'notes'), ('name', 'notes'))
+    object_fields(m['style'], ('name', 'notes', 'pace', 'reaction_bias', 'detail_bias'), ('name', 'notes'))
+    for axis in ('pace', 'reaction_bias', 'detail_bias'):
+        if axis in m['style']:
+            m['style'][axis] = number(m['style'][axis], 'style '+axis, -1, 1)
     text(m['style']['name'], 'style name', 120)
     if not isinstance(m['style']['notes'], str) or len(m['style']['notes']) > 4000:
         raise ValueError('Invalid style notes')

@@ -11,7 +11,7 @@ import uuid
 from .runtime import atomic_json,file_lock
 from .web_core import read_json,stamp
 
-ALLOWED={'camix_director.'+name for name in ('train','evaluate','prepare','ami','export','synthetic','inspect_data','dataset_tools','replay','raw_demo','gates','media_proxy','v2')}
+ALLOWED={'camix_director.'+name for name in ('train','evaluate','prepare','ami','export','synthetic','inspect_data','dataset_tools','replay','raw_demo','gates','media_proxy','v2','stages_v2')}
 
 
 def run(directory):

@@ -16,6 +16,13 @@ class V2Studio:
 
     def get(self, route, query):
         first = lambda name, default='': query.get(name, [default])[0]
+        if route == '/api/studio/v2/stages/catalog':
+            from .stages_api_v2 import catalogue
+            return catalogue(self.root)
+        if route == '/api/studio/v2/stages/policy-config':
+            from .policy_io_v2 import load_policy
+            model,p=load_policy(artifact_path(self.root,first('path')))
+            return dict(config=p['config'],settings=p['settings'],qualification=p['qualification'])
         if route == '/api/studio/v2/status':
             base = self.root / 'runs/v2'
             return dict(stage='P0/P1 research foundation', v2_model_available=False, production_approved=False,
@@ -46,6 +53,11 @@ class V2Studio:
     def post(self, route, payload):
         if not isinstance(payload, dict):
             raise ValueError('JSON object required')
+        if route.startswith('/api/studio/v2/stages/'):
+            from .stages_api_v2 import STAGE_COMMANDS
+            command=route.rsplit('/',1)[-1]
+            if command not in STAGE_COMMANDS:raise ValueError('Unknown stage operation')
+            return self.manager.start({**payload,'kind':'v2_stage_'+command})
         if route == '/api/studio/v2/create':
             return self.store.create(payload['manifest'])
         if route == '/api/studio/v2/import-v1':
@@ -63,6 +75,9 @@ class V2Studio:
 
 def job_spec(manager, payload, jobdir):
     """No V1 config/dataset required; all compute runs under the existing worker lock."""
+    if payload['kind'].startswith('v2_stage_'):
+        from .stages_api_v2 import make_job
+        return make_job(manager,payload,jobdir)
     from .web_core import stamp
     root, kind, uid = manager.root, payload['kind'], jobdir.name
     store = EventStore(root)
