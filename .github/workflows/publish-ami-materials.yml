@@ -1,0 +1,31 @@
+name: Publish verified AMI materials
+'on':
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: '全部54个附件校验成功后公开素材草稿'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: ami-materials-release
+  cancel-in-progress: false
+jobs:
+  mirror-and-publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror official signals and verify all material assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_RELEASE: ${{ inputs.publish }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$PUBLISH_RELEASE" == "true" ]]; then args+=(--publish); fi
+          python3 scripts/publish_ami_materials.py \
+            --plan examples/ami-materials-release-20261116.json "${args[@]}"
